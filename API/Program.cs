@@ -31,6 +31,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IMemberRepository, MemberRepository>();
 
 var app = builder.Build();
 
@@ -47,5 +48,21 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using var scope = app.Services.CreateScope();
+var service = scope.ServiceProvider;
+
+try
+{
+    var context = service.GetRequiredService<AppDbContext>();
+    await context.Database.MigrateAsync();
+    await Seed.SeedUsers(context);
+}
+catch (Exception ex)
+{   
+    var logger = service.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex,"An error ocurred during migrations");
+}
+
 
 app.Run();
