@@ -5,6 +5,7 @@ import { Member } from '../../../types/member';
 import { AgePipe } from '../../../core/pipes/age-pipe';
 import { AccountService } from '../../../core/services/account-service';
 import { MemberService } from '../../../core/services/member-service';
+import { PresenceService } from '../../../core/services/presence-service';
 
 @Component({
   selector: 'app-member-detail',
@@ -19,6 +20,7 @@ export class MemberDetail implements OnInit {
   protected memberService = inject(MemberService);
   protected title = signal<string | undefined>('Profile');
   protected isCurrentUser = signal<boolean>(false);
+  protected presenseService = inject(PresenceService);
 
   ngOnInit(): void {
     this.isCurrentUser.set(this.accountService.currentUser()?.id === this.memberService.member()?.id);
